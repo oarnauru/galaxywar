@@ -6,7 +6,7 @@ var entities = {
             friction:0.4,
             restitution:0.15,
         },
-        "hood":{
+        "wood":{
             fullHealth:500,
             density:0.7,
             friction:0.4,
@@ -77,6 +77,7 @@ var entities = {
 	            entity.fullHealth = definition.fullHealth;
 	            entity.shape = "rectangle";
 	            entity.sprite = loader.loadImage("images/entities/"+entity.name+".png");
+				entity.breakSound = game.breakSound[entity.name];
 	            box2d.createRectangle(entity,definition);
 	            break;
 	        case "ground": // simple rectangles
@@ -91,6 +92,7 @@ var entities = {
 	            entity.fullHealth = definition.fullHealth;
 	            entity.sprite = loader.loadImage("images/entities/"+entity.name+".png");
 	            entity.shape = definition.shape;
+				entity.bounceSound = game.bounceSound;
 	            if(definition.shape == "circle"){
 	                entity.radius = definition.radius;
 	                box2d.createCircle(entity,definition);

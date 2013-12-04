@@ -6,15 +6,15 @@ var levels = {
 	    background:'red-sun',
 	    entities:[
 	        {type:"ground", name:"dirt", x:500,y:440,width:1000,height:20,isStatic:true},
-	        {type:"ground", name:"hood", x:180,y:390,width:40,height:80,isStatic:true},
+	        {type:"ground", name:"wood", x:180,y:390,width:40,height:80,isStatic:true},
 
-	        {type:"block", name:"hood", x:500,y:375,angle:90,width:100,height:25},
+	        {type:"block", name:"wood", x:500,y:375,angle:90,width:100,height:25},
 	        {type:"block", name:"ice", x:500,y:275,angle:90,width:100,height:25},
-	        {type:"villain", name:"soldier",x:500,y:200,calories:590},
+	        {type:"villain", name:"soldier",x:500,y:200,milicronians:590},
 
-	        {type:"block", name:"hood", x:600,y:375,angle:90,width:100,height:25},
+	        {type:"block", name:"wood", x:600,y:375,angle:90,width:100,height:25},
 	        {type:"block", name:"ice", x:600,y:275,angle:90,width:100,height:25},
-	        {type:"villain", name:"vader", x:600,y:200,calories:420},
+	        {type:"villain", name:"vader", x:600,y:200,milicronians:420},
 
 	        {type:"hero", name:"c3po",x:90,y:410},
 	        {type:"hero", name:"skywalker",x:150,y:410},
@@ -25,19 +25,19 @@ var levels = {
 	        background:'black-moon',
 	        entities:[
 	            {type:"ground", name:"dirt", x:500,y:440,width:1000,height:20,isStatic:true},
-	            {type:"ground", name:"hood", x:180,y:390,width:40,height:80,isStatic:true},
-	            {type:"block", name:"hood", x:820,y:375,angle:90,width:100,height:25},
-	            {type:"block", name:"hood", x:720,y:375,angle:90,width:100,height:25},
-	            {type:"block", name:"hood", x:620,y:375,angle:90,width:100,height:25},
+	            {type:"ground", name:"wood", x:180,y:390,width:40,height:80,isStatic:true},
+	            {type:"block", name:"wood", x:820,y:375,angle:90,width:100,height:25},
+	            {type:"block", name:"wood", x:720,y:375,angle:90,width:100,height:25},
+	            {type:"block", name:"wood", x:620,y:375,angle:90,width:100,height:25},
 	            {type:"block", name:"ice", x:670,y:310,width:100,height:25},
 	            {type:"block", name:"ice", x:770,y:310,width:100,height:25},
 
 	            {type:"block", name:"ice", x:670,y:248,angle:90,width:100,height:25},
 	            {type:"block", name:"ice", x:770,y:248,angle:90,width:100,height:25},
-	            {type:"block", name:"hood", x:720,y:180,width:100,height:25},
-	            {type:"villain", name:"soldier",x:715,y:160,calories:590},
-	            {type:"villain", name:"vader",x:670,y:400,calories:420},
-	            {type:"villain", name:"soldier_2",x:765,y:395,calories:150},
+	            {type:"block", name:"wood", x:720,y:180,width:100,height:25},
+	            {type:"villain", name:"soldier",x:715,y:160,milicronians:590},
+	            {type:"villain", name:"vader",x:670,y:400,milicronians:420},
+	            {type:"villain", name:"soldier_2",x:765,y:395,milicronians:150},
 
 	            {type:"hero", name:"yoda",x:40,y:420},
 	            {type:"hero", name:"c3po",x:90,y:410},

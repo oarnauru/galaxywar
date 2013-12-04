@@ -26,6 +26,40 @@ var box2d = {
 		debugDraw.SetLineThickness(1.0);
 		debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
 		box2d.world.SetDebugDraw(debugDraw);
+		
+		var listener = new Box2D.Dynamics.b2ContactListener;
+		
+	    listener.PostSolve = function(contact,impulse){
+	        var body1 = contact.GetFixtureA().GetBody();
+	        var body2 = contact.GetFixtureB().GetBody();
+	        var entity1 = body1.GetUserData();
+	        var entity2 = body2.GetUserData();
+
+	        var impulseAlongNormal = Math.abs(impulse.normalImpulses[0]);
+	        // This listener is called a little too often. Filter out very tiny impulses.
+	        // After trying different values, 5 seems to work well
+	        if(impulseAlongNormal>5){
+	            // If objects have a health, reduce health by the impulse value
+	            if (entity1.health){
+	                entity1.health -= impulseAlongNormal;
+	            }
+
+	            if (entity2.health){
+	                entity2.health -= impulseAlongNormal;
+	            }
+	
+		        // If objects have a bounce sound, play the sound
+		        if (entity1.bounceSound){
+		            entity1.bounceSound.play();
+		        }
+
+		        if (entity2.bounceSound){
+		            entity2.bounceSound.play();
+		        }
+	        }
+	    };
+	    box2d.world.SetContactListener(listener);
+		
     },
 
     createRectangle:function(entity,definition){

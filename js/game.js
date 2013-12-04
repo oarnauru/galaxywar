@@ -6,13 +6,24 @@ var game = {
 		loader.init();
 		mouse.init();
 		
+	    game.backgroundMusic = loader.loadSound('sounds/imperial-march');
+
+	    game.slingshotReleasedSound = loader.loadSound("sounds/fire");
+	    game.bounceSound = loader.loadSound('sounds/bounce');
+		game.chewakaSound = loader.loadSound('sounds/Chewbacca_Sound')
+		game.loadHero = loader.loadSound('sounds/loadHero')
+	    game.breakSound = {
+	        "ice":loader.loadSound('sounds/icebreak'),
+	        "wood":loader.loadSound('sounds/woodbreak')
+	    };
+	
         // Hide all game layers and display the start screen
         $('.gamelayer').hide();
         $('#gamestartscreen').show();
 
         //Get handler for game canvas and context
         game.canvas = $('#gamecanvas')[0];
-        game.context = game.canvas.getContext('2d');
+		game.context = game.canvas.getContext('2d');
     },
 
 	showLevelScreen:function(){
@@ -31,6 +42,8 @@ var game = {
 	    $('#gamecanvas').show();
 	    $('#scorescreen').show();
 
+		game.startBackgroundMusic();
+		
 	    game.mode = "intro";
 	    game.offsetLeft = 0;
 	    game.ended = false;
@@ -105,6 +118,7 @@ var game = {
 					game.currentHero.SetPosition({x:(mouse.x+game.offsetLeft)/box2d.scale,y:mouse.y/box2d.scale});
 			    } else {
 			        game.mode = "fired";
+					game.slingshotReleasedSound.play();
 			        var impulseScaleFactor = 0.75;
 			        var impulse = new b2Vec2((game.slingshotX+35-mouse.x-game.offsetLeft)*impulseScaleFactor,(game.slingshotY+25-mouse.y)*impulseScaleFactor);
 			        game.currentHero.ApplyImpulse(impulse,game.currentHero.GetWorldCenter());
@@ -142,6 +156,7 @@ var game = {
 
 	        // Load the hero and set mode to wait-for-firing
 	        if(!game.currentHero){
+				game.loadHero.play();
 				game.currentHero = game.heroes[game.heroes.length-1];
 				game.currentHero.SetPosition({x:180/box2d.scale,y:200/box2d.scale});
 				game.currentHero.SetLinearVelocity({x:0,y:0});
@@ -155,6 +170,13 @@ var game = {
 	            }
 	        }
 	    }
+	
+		if(game.mode=="level-success" || game.mode=="level-failure"){
+		    if(game.panTo(0)){
+		        game.ended = true;
+		        game.showEndingScreen();
+		    }
+		}
 	},
 	animate:function(){
 	    // Animate the background
@@ -181,6 +203,11 @@ var game = {
 
 		// Draw all the bodies
 		game.drawAllBodies();
+		
+	    // Draw the band when we are firing a hero
+	    if(game.mode == "firing"){
+	        game.drawSlingshotBand();
+	    }
 
 		// Draw the front of the slingshot
 		game.context.drawImage(game.slingshotFrontImage,game.slingshotX-game.offsetLeft,game.slingshotY);
@@ -191,13 +218,25 @@ var game = {
 	},
 	drawAllBodies:function(){
 	    box2d.world.DrawDebugData();
-
+	    
 	    // Iterate through all the bodies and draw them on the game canvas
 	    for (var body = box2d.world.GetBodyList(); body; body = body.GetNext()) {
 	        var entity = body.GetUserData();
-
 	        if(entity){
-	            entities.draw(entity,body.GetPosition(),body.GetAngle())
+	            var entityX = body.GetPosition().x*box2d.scale;
+	            if(entityX<0|| entityX>game.currentLevel.foregroundImage.width||(entity.health && entity.health <0)){
+	                box2d.world.DestroyBody(body);
+	                if (entity.type=="villain"){
+	                    game.score += entity.milicronians;
+	                    $('#milicronians').html('Milicronians: '+game.score);
+	                }
+	
+	                if (entity.breakSound){
+	                    entity.breakSound.play();
+	                }
+	            } else {
+	                entities.draw(entity,body.GetPosition(),body.GetAngle())
+	            }
 	        }
 	    }
 	},
@@ -209,6 +248,86 @@ var game = {
 		var distanceSquared = Math.pow(position.x*box2d.scale - mouse.x-game.offsetLeft,2) + Math.pow(position.y*box2d.scale-mouse.y,2);
 		var radiusSquared = Math.pow(game.currentHero.GetUserData().radius,2);
 		return (distanceSquared<= radiusSquared);
+	},
+	showEndingScreen:function(){
+		game.stopBackgroundMusic();
+		game.chewakaSound.play();
+	    if (game.mode=="level-success"){
+	        if(game.currentLevel.number<levels.data.length-1){
+	            $('#endingmessage').html('Level Complete. Well Done!!!');
+	            $("#playnextlevel").show();
+	        } else {
+	            $('#endingmessage').html('All Levels Complete. Well Done!!!');
+	            $("#playnextlevel").hide();
+	        }
+	    } else if (game.mode=="level-failure"){
+	        $('#endingmessage').html('Failed. Play Again?');
+	        $("#playnextlevel").hide();
+	    }
+	    $('#endingscreen').show();
+	},
+	drawSlingshotBand:function(){
+	    game.context.strokeStyle = "rgb(68,31,11)"; // Darker brown color
+	    game.context.lineWidth = 6; // Draw a thick line
+
+	    // Use angle hero has been dragged and radius to calculate coordinates of edge of hero wrt. hero center
+	    var radius = game.currentHero.GetUserData().radius;
+	    var heroX = game.currentHero.GetPosition().x*box2d.scale;
+	    var heroY = game.currentHero.GetPosition().y*box2d.scale;
+	    var angle = Math.atan2(game.slingshotY+25-heroY,game.slingshotX+50-heroX);
+
+	    var heroFarEdgeX = heroX - radius * Math.cos(angle);
+	    var heroFarEdgeY = heroY - radius * Math.sin(angle);
+
+	    game.context.beginPath();
+	    // Start line from top of slingshot (the back side)
+	    game.context.moveTo(game.slingshotX+50-game.offsetLeft, game.slingshotY+25);
+
+	    // Draw line to center of hero
+	    game.context.lineTo(heroX-game.offsetLeft,heroY);
+	    game.context.stroke();
+	    // Draw the hero on the back band
+
+		entities.draw(game.currentHero.GetUserData(),game.currentHero.GetPosition(),game.currentHero.GetAngle());
+
+	    game.context.beginPath();
+	    // Move to edge of hero farthest from slingshot top
+	    game.context.moveTo(heroFarEdgeX-game.offsetLeft,heroFarEdgeY);
+
+	    // Draw line back to top of slingshot (the front side)
+	    game.context.lineTo(game.slingshotX-game.offsetLeft +10,game.slingshotY+30)
+	    game.context.stroke();
+	},
+	restartLevel:function(){
+	    window.cancelAnimationFrame(game.animationFrame);
+	    game.lastUpdateTime = undefined;
+	    levels.load(game.currentLevel.number);
+	},
+	startNextLevel:function(){
+	    window.cancelAnimationFrame(game.animationFrame);
+	    game.lastUpdateTime = undefined;
+	    levels.load(game.currentLevel.number+1);
+	},
+	startBackgroundMusic:function(){
+	    var toggleImage = $("#togglemusic")[0];
+	    game.backgroundMusic.play();
+	    toggleImage.src="images/icons/sound.png";
+	},
+	stopBackgroundMusic:function(){
+	    var toggleImage = $("#togglemusic")[0];
+	    toggleImage.src="images/icons/nosound.png";
+	    game.backgroundMusic.pause();
+	    game.backgroundMusic.currentTime = 0; // Go to the beginning of the song
+	},
+	toggleBackgroundMusic:function(){
+	    var toggleImage = $("#togglemusic")[0];
+	    if(game.backgroundMusic.paused){
+	        game.backgroundMusic.play();
+	        toggleImage.src="images/icons/sound.png";
+	    } else {
+	        game.backgroundMusic.pause();
+	        $("#togglemusic")[0].src="images/icons/nosound.png";
+	    }
 	}
 }
 
