@@ -1,9 +1,9 @@
 var loader = {
-    loaded:true,
-    loadedCount:0, // Assets that have been loaded so far
-    totalCount:0, // Total number of assets that need to be loaded
+	loaded:true,
+	loadedCount:0, // Assets that have been loaded so far
+	totalCount:0, // Total number of assets that need to be loaded
 
-         init:function(){
+	init:function(){
         // check for sound support
         var mp3Support,oggSupport;
         var audio = document.createElement('audio');
@@ -22,11 +22,12 @@ var loader = {
     },
 
     loadImage:function(url){
+		console.log('Vamos a cargar: '+url)
         this.totalCount++;
         this.loaded = false;
         $('#loadingscreen').show();
         var image = new Image();
-        image.src = url;
+        image.src = url;	
         image.onload = loader.itemLoaded;
         return image;
     },
@@ -42,6 +43,7 @@ var loader = {
     },
     itemLoaded:function(){
         loader.loadedCount++;
+		console.log('Augmentando cargados en :'+loader.loadedCount)
         $('#loadingmessage').html('Loaded ' + loader.loadedCount + ' of ' + loader.totalCount);
         if (loader.loadedCount === loader.totalCount){
             // Loader has loaded completely..
