@@ -264,6 +264,8 @@ var game = {
 	        $('#endingmessage').html('Failed. Play Again?');
 	        $("#playnextlevel").hide();
 	    }
+		loader.totalCount = 0;
+		loader.loadedCount = 0;
 	    $('#endingscreen').show();
 	},
 	drawSlingshotBand:function(){
